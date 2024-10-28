@@ -27,7 +27,7 @@ class MedicoService:
             except Exception as e:
                 print(f"Error al crear el usuario: {e}")
                 
-    #@staticmethod
+    @staticmethod
     @db_session
     def authenticate_medico(email: str, password: str):
         medico = models.Medico.get(email=email)
