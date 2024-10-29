@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from src.services.patient_services import PatientService
 from src.schemas import PatientCreate, PatientUpdate, PacienteResponse  
 
@@ -6,9 +6,13 @@ router = APIRouter()
 
 patient_service = PatientService()
 
-@router.post("/create", response_model=PacienteResponse) 
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_patient(patient_data: PatientCreate): 
-    return patient_service.create_patient(patient_data)
+    patient = patient_service.create_patient(patient_data)
+    if not patient:
+        raise HTTPException(status_code=500, detail="Error al crear el paciente")
+    return patient  # Asegura que `patient` es un diccionario válido y compatible
+
 
 @router.get("/get/{patient_id}")
 def get_patient(patient_id: int):

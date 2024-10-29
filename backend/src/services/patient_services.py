@@ -11,23 +11,23 @@ class PatientService:
 
     @db_session
     def create_patient(self, patient_data: schemas.PatientCreate):
+        medico = models.Medico.get(id=patient_data.medico_id)
+        if not medico:
+            raise HTTPException(status_code=404, detail="Médico no encontrado")
+        
         try:
-            # Verifica si el médico existe
-            medico = models.Medico.get(id=patient_data.medico_id)  # Uso correcto de patient_data
-            if not medico:
-                raise HTTPException(status_code=404, detail="Médico no encontrado")
-            
-            # Lógica para crear un paciente
             patient = models.Patient(
-                nombre=patient_data.nombre,  # Uso correcto de patient_data
-                apellido=patient_data.apellido,  # Uso correcto de patient_data
-                dni=patient_data.dni,  # Uso correcto de patient_data
-                fecha_nacimiento=patient_data.fecha_nacimiento,  # Uso correcto de patient_data
-                obrasocial=patient_data.obrasocial,  # Uso correcto de patient_data
-                medico=medico  # Asignar médico usando el objeto encontrado
+                nombre=patient_data.nombre,
+                apellido=patient_data.apellido,
+                dni=patient_data.dni,
+                fecha_nacimiento=patient_data.fecha_nacimiento,
+                obrasocial=patient_data.obrasocial,
+                medico=patient_data.medico_id
             )
+            return patient.to_dict()  # Asegura que retornas un diccionario
         except TransactionIntegrityError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail="Paciente ya existe o datos incorrectos")
+
 
     @db_session
     def get_patient(self, patient_id: int):

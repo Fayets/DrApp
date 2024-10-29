@@ -60,11 +60,7 @@ class PacienteResponse(BaseModel):
     dni: str
     fecha_nacimiento: date
     obrasocial: str
-    medico_id: int  # Agregar este campo
-    historias_clinicas: List[HistoriaClinicaCreate] = []
-
-#-----------------------------------------#
-
+    medico_id: int  
 
 
 
