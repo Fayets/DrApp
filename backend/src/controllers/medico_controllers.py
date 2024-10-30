@@ -8,7 +8,7 @@ from datetime import date
 
 router = APIRouter()
 
-medico_service = MedicoService
+medico_service = MedicoService()
 
 
 @router.post("/register", response_model=RegisterMessage, status_code=201)

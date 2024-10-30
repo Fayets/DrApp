@@ -1,16 +1,35 @@
 import reflex as rx
+import httpx
+
 
 class LoginState(rx.State):
-    username: str = ""
+    email: str = ""
     password: str = ""
     error_message: str = ""
+
+    async def verificar(self):
+        url = "http://127.0.0.1:8001/login"  # Asegúrate de que la URL es correcta
+
+        try:
+            response = await httpx.post(url, json={"email": self.email, "password": self.password})
+
+            if response.is_success:
+                data = response.json()
+                print("Login exitoso:", data["msg"])
+                self.error_message = ""
+                rx.redirect("/#")  # Redirige a otra página tras el login exitoso
+            else:
+                print("Error en el login:", response.status_code, response.text)
+                self.error_message = "Credenciales incorrectas, intenta nuevamente."
+        except Exception as e:
+            print("Error al realizar la solicitud:", e)
+            self.error_message = "Error en la conexión. Intenta nuevamente."
+
 
 @rx.page(route="/", title="Inicio de Sesión")
 def login() -> rx.Component:
     return rx.box(
-        # Contenedor exterior principal
         rx.box(
-            # Logo y título
             rx.flex(
                 rx.image(src="/logo.png", width="50px", height="50px"),
                 justify_content="center",
@@ -25,12 +44,11 @@ def login() -> rx.Component:
                 align_items="center",
                 justify_content="center",
             ),
-            # Cuadro de credenciales
             rx.box(
                 rx.text("Correo electrónico", color="#333", font_size="0.9rem"),
                 rx.input(
                     placeholder="Correo electrónico",
-                    on_change=LoginState.set_username,
+                    on_change=lambda value: LoginState.set_email(value),
                     padding="0.5rem",
                     border_radius="0.3rem",
                     border="1px solid #ccc",
@@ -42,7 +60,7 @@ def login() -> rx.Component:
                 rx.input(
                     type="password",
                     placeholder="Contraseña",
-                    on_change=LoginState.set_password,
+                    on_change=lambda value: LoginState.set_password(value),
                     padding="0.5rem",
                     border_radius="0.3rem",
                     border="1px solid #ccc",
@@ -54,7 +72,7 @@ def login() -> rx.Component:
                 rx.button(
                     "Iniciar sesión",
                     type="submit",
-                   # on_click=LoginState.verificar,
+                    on_click=LoginState.verificar,
                     bg="#333",
                     color="white",
                     width="100%",
@@ -62,7 +80,7 @@ def login() -> rx.Component:
                     border_radius="0.3rem",
                     mt="1rem",
                     _hover={"bg": "#555"},
-                    box_shadow="0 6px 12px rgba(0, 0, 0, 0.3)",  # Aumentar sombra del botón
+                    box_shadow="0 6px 12px rgba(0, 0, 0, 0.3)",
                 ),
                 rx.spacer(1),
                 rx.button(
@@ -76,16 +94,17 @@ def login() -> rx.Component:
                     border_radius="0.3rem",
                     mt="1rem",
                     _hover={"bg": "#555"},
-                    box_shadow="0 6px 12px rgba(0, 0, 0, 0.3)",  # Aumentar sombra del botón
+                    box_shadow="0 6px 12px rgba(0, 0, 0, 0.3)",
                 ),
-                # Mensaje de error
-                rx.cond(LoginState.error_message != "", 
-                        rx.text(LoginState.error_message, color="red", mt="0.5rem")),
+                rx.cond(
+                    LoginState.error_message != "", 
+                    rx.text(LoginState.error_message, color="red", mt="0.5rem")
+                ),
                 padding="1.5rem",
                 border="1px solid rgba(128, 128, 128, 0.5)",
                 border_radius="0.5rem",
                 width="22rem",
-                box_shadow="0 12px 24px rgba(0, 0, 0, 0.2)",  # Aumentar sombra del cuadro de credenciales
+                box_shadow="0 12px 24px rgba(0, 0, 0, 0.2)",
                 bg="rgba(255, 255, 255, 0.3)",
                 mt="1.5rem",
                 margin="auto",

@@ -15,13 +15,4 @@ db.bind(
     sslmode='require'  # Asegura que se use SSL, Neon lo requiere
 )
 
-# Definir una sesión para probar la conexión
-"""@db_session
-def prueba_conexion():
-    try:
-        # Intenta obtener alguna información de la base de datos
-        db.execute("SELECT 1")
-        print("Conexión exitosa a la base de datos.")
-    except Exception as e:
-        print(f"Error en la conexión: {e}")"""
 

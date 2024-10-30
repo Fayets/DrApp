@@ -34,6 +34,5 @@ def index() -> rx.Component:
         rx.logo(),
     )
 
-
-app = rx.App()
+app = rx.App(backend_port=8082)
 app.add_page(index)
