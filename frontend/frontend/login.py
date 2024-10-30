@@ -1,23 +1,22 @@
 import reflex as rx
 import httpx
 
-
 class LoginState(rx.State):
     email: str = ""
     password: str = ""
     error_message: str = ""
 
-    async def verificar(self):
-        url = "http://127.0.0.1:8001/login"  # Asegúrate de que la URL es correcta
+    def verificar(self):
+        url = "http://127.0.0.1:8002/medico/login"  # Asegúrate de que la URL es correcta
 
         try:
-            response = await httpx.post(url, json={"email": self.email, "password": self.password})
-
+            response = httpx.post(url, json={"email": self.email, "password": self.password})
+            
             if response.is_success:
                 data = response.json()
                 print("Login exitoso:", data["msg"])
                 self.error_message = ""
-                rx.redirect("/#")  # Redirige a otra página tras el login exitoso
+                self.redirect_to_home()  # Llama a la redirección tras el login exitoso
             else:
                 print("Error en el login:", response.status_code, response.text)
                 self.error_message = "Credenciales incorrectas, intenta nuevamente."
@@ -25,6 +24,9 @@ class LoginState(rx.State):
             print("Error al realizar la solicitud:", e)
             self.error_message = "Error en la conexión. Intenta nuevamente."
 
+    def redirect_to_home(self):
+        """Redirige al usuario a la página de inicio."""
+        rx.redirect("/home")
 
 @rx.page(route="/", title="Inicio de Sesión")
 def login() -> rx.Component:

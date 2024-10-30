@@ -11,38 +11,59 @@ class RegisterState(rx.State):
     confirm_password: str = ""
     error_message: str = ""
 
-    async def registrar(self):
-        # Validar que las contraseñas coincidan
+    def set_nombre(self, value: str):
+        self.nombre = value
+
+    def set_apellido(self, value: str):
+        self.apellido = value
+
+    def set_email(self, value: str):
+        self.email = value
+
+    def set_dni(self, value: str):
+        self.dni = value
+
+    def set_esp(self, value: str):
+        self.esp = value
+
+    def set_password(self, value: str):
+        self.password = value
+
+    def set_confirm_password(self, value: str):
+        self.confirm_password = value
+
+    def registrar(self):
         if self.password != self.confirm_password:
             self.error_message = "Las contraseñas no coinciden."
+            print("Error: Las contraseñas no coinciden.")  # Documentación del error
             return
-        
-        # URL del backend
-        url = "http://localhost:8001/register"  # Cambia esto según tu configuración
 
-        # Hacer la solicitud POST
-        async with httpx.AsyncClient() as client:
-            try:
-                response = await client.post(
-                    url,
-                    json={
-                        "nombre": self.nombre,
-                        "apellido": self.apellido,
-                        "email": self.email,
-                        "dni": self.dni,
-                        "especialidad": self.esp,
-                        "password": self.password,
-                    }
-                )
-                response.raise_for_status()  # Lanza un error si la respuesta es un error
-                # Redirigir al inicio de sesión si el registro es exitoso
-                rx.redirect("/login")
-            except httpx.HTTPStatusError as e:
-                # Manejo de errores específico basado en el código de estado HTTP
-                self.error_message = f"Error al registrarse: {e.response.text}"
-            except Exception as e:
-                # Manejo de errores generales
-                self.error_message = f"Ocurrió un error: {str(e)}"
+        url = "http://127.0.0.1:8002/medico/register"
+        
+        try:
+            response = httpx.post(
+                url,
+                json={
+                    "nombre": self.nombre,
+                    "apellido": self.apellido,
+                    "email": self.email,
+                    "dni": self.dni,
+                    "especialidad": self.esp,
+                    "password": self.password,
+                }
+            )
+            response.raise_for_status()
+            
+            # Redirigir al inicio de sesión si el registro es exitoso
+            rx.redirect("/login")
+        except httpx.HTTPStatusError as e:
+            self.error_message = f"Error al registrarse: {e.response.text}"
+            print(f"HTTP Error: {e.response.status_code} - {e.response.text}")  # Documentación del error
+        except Exception as e:
+            self.error_message = f"Ocurrió un error: {str(e)}"
+            print(f"General Error: {str(e)}")  # Documentación del error
+
+
 
 app = rx.App()
 
