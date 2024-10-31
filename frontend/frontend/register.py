@@ -10,6 +10,7 @@ class RegisterState(rx.State):
     password: str = ""
     confirm_password: str = ""
     error_message: str = ""
+    success_message: str = ""  # Mensaje de éxito para mostrar al usuario
 
     def set_nombre(self, value: str):
         self.nombre = value
@@ -32,7 +33,7 @@ class RegisterState(rx.State):
     def set_confirm_password(self, value: str):
         self.confirm_password = value
 
-    def registrar(self):
+    async def registrar(self):
         if self.password != self.confirm_password:
             self.error_message = "Las contraseñas no coinciden."
             print("Error: Las contraseñas no coinciden.")  # Documentación del error
@@ -41,29 +42,39 @@ class RegisterState(rx.State):
         url = "http://127.0.0.1:8002/medico/register"
         
         try:
-            response = httpx.post(
-                url,
-                json={
-                    "nombre": self.nombre,
-                    "apellido": self.apellido,
-                    "email": self.email,
-                    "dni": self.dni,
-                    "especialidad": self.esp,
-                    "password": self.password,
-                }
-            )
-            response.raise_for_status()
-            
-            # Redirigir al inicio de sesión si el registro es exitoso
-            rx.redirect("/login")
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    url,
+                    json={
+                        "nombre": self.nombre,
+                        "apellido": self.apellido,
+                        "email": self.email,
+                        "dni": self.dni,
+                        "especialidad": self.esp,
+                        "password": self.password,
+                    }
+                )
+                response.raise_for_status()
+                
+                # Mensaje de éxito al registrar
+                self.success_message = "Médico creado exitosamente."  # Mensaje de éxito
+                self.error_message = ""  # Limpiar cualquier mensaje de error
+
+                # Limpiar los campos después del registro exitoso
+                self.nombre = ""
+                self.apellido = ""
+                self.email = ""
+                self.dni = ""
+                self.esp = ""
+                self.password = ""
+                self.confirm_password = ""
+
         except httpx.HTTPStatusError as e:
             self.error_message = f"Error al registrarse: {e.response.text}"
             print(f"HTTP Error: {e.response.status_code} - {e.response.text}")  # Documentación del error
         except Exception as e:
             self.error_message = f"Ocurrió un error: {str(e)}"
             print(f"General Error: {str(e)}")  # Documentación del error
-
-
 
 app = rx.App()
 
@@ -172,6 +183,26 @@ def register() -> rx.Component:
                 # Mensaje de error
                 rx.cond(RegisterState.error_message != "", 
                         rx.text(RegisterState.error_message, color="red", mt="0.5rem")),
+                # Mensaje de éxito
+                rx.cond(RegisterState.success_message != "", 
+                        rx.text(RegisterState.success_message, color="green", mt="0.5rem")),
+                # Botón "Iniciar Sesión" dentro del contenedor
+                rx.box(
+                    rx.spacer("1"),
+                    rx.button(
+                        "Iniciar Sesión",
+                        on_click=lambda: rx.redirect("/"),  # Redirige a la página de login
+                        bg="#333",
+                        color="white",
+                        width="100%",
+                        padding="0.5rem",
+                        border_radius="0.3rem",
+                        _hover={"bg": "#555"},
+                        box_shadow="0 6px 12px rgba(0, 0, 0, 0.3)",
+                        mt="1rem"  # Margen superior para separar del registro
+                    ),
+                    width="100%",
+                ),
                 padding="1.5rem",
                 border="1px solid rgba(128, 128, 128, 0.5)",
                 border_radius="0.5rem",
