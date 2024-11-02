@@ -83,7 +83,7 @@ def registrar_paciente():
                             margin_bottom="1vh",
                             bg="white",
                             color="black",
-                            on_change=RegisterPatientState.set_nombre,  # Añadir on_change
+                            on_change=RegisterPatientState.set_nombre,
                             _focus={"border_bottom": "2px solid #3182ce"},
                         ),
                         rx.text("Apellido", color="#333", font_size="0.8rem", align_self="center"),
@@ -94,7 +94,7 @@ def registrar_paciente():
                             margin_bottom="1vh",
                             bg="white",
                             color="black",
-                            on_change=RegisterPatientState.set_apellido,  # Añadir on_change
+                            on_change=RegisterPatientState.set_apellido,
                             _focus={"border_bottom": "2px solid #3182ce"},
                         ),
                         rx.text("DNI", color="#333", font_size="0.8rem", align_self="center"),
@@ -105,7 +105,7 @@ def registrar_paciente():
                             margin_bottom="1vh",
                             bg="white",
                             color="black",
-                            on_change=RegisterPatientState.set_dni,  # Añadir on_change
+                            on_change=RegisterPatientState.set_dni,
                             _focus={"border_bottom": "2px solid #3182ce"},
                         ),
                     ),
@@ -120,19 +120,19 @@ def registrar_paciente():
                             margin_bottom="1vh",
                             bg="white",
                             color="black",
-                            on_change=RegisterPatientState.set_fecha_nacimiento,  # Añadir on_change
+                            on_change=RegisterPatientState.set_fecha_nacimiento,
                             _focus={"border_bottom": "2px solid #3182ce"},
                         ),
                         rx.text("Médico a Cargo (ID)", color="#333", font_size="0.8rem", align_self="center"),
                         rx.input(
-                            type_="text",  # Cambiar a text para recibir el ID
+                            type_="text",
                             border="none",
                             border_bottom="1px solid #ccc",
                             padding="0.5rem",
                             margin_bottom="1vh",
                             bg="white",
                             color="black",
-                            on_change=RegisterPatientState.set_medico_id,  # Añadir on_change
+                            on_change=RegisterPatientState.set_medico_id,
                             _focus={"border_bottom": "2px solid #3182ce"},
                         ),
                         rx.text("Obra Social", color="#333", font_size="0.8rem", align_self="center"),
@@ -143,7 +143,7 @@ def registrar_paciente():
                             margin_bottom="1vh",
                             bg="white",
                             color="black",
-                            on_change=RegisterPatientState.set_obrasocial,  # Añadir on_change
+                            on_change=RegisterPatientState.set_obrasocial,
                             _focus={"border_bottom": "2px solid #3182ce"},
                         ),
                         width="48%",
@@ -174,6 +174,16 @@ def registrar_paciente():
                 box_shadow="0 12px 24px rgba(0, 0, 0, 0.2)",
                 bg="rgba(255, 255, 255, 0.3)",
                 backdrop_filter="blur(10px)",
+            ),
+            # Mensaje de éxito
+            rx.cond(
+                RegisterPatientState.success_message != "",
+                rx.text(RegisterPatientState.success_message, color="green", font_size="1rem"),
+            ),
+            # Mensaje de error
+            rx.cond(
+                RegisterPatientState.error_message != "",
+                rx.text(RegisterPatientState.error_message, color="red", font_size="1rem"),
             ),
             spacing="0.5rem",
             width="100%",

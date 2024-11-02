@@ -21,10 +21,10 @@ class MedicoService:
                     especialidad=medico.especialidad
                 )
                 print("Medico creado correctamente")
-                return nuevo_medico  # Devolver el médico creado
+                return nuevo_medico  
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
-                raise HTTPException(status_code=400, detail=str(e))  # Lanzar un HTTPException
+                raise HTTPException(status_code=400, detail=str(e))  
             except Exception as e:
                 print(f"Error al crear el usuario: {e}")
                 raise HTTPException(status_code=500, detail="Error inesperado")
